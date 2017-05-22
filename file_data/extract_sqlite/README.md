@@ -1,4 +1,4 @@
-##Extract SQLite DB##
+## Extract SQLite DB
 
 This script attempts to extract sqlite databases from data files. It searches for all sqlite magic string "SQLite format3\x00'" then reads the headers.
 
