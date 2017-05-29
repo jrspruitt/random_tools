@@ -1,0 +1,62 @@
+#!/usr/bin/env python
+##
+# @license Mechcalc Copyright 2013 Jason Pruitt 
+# This file is part of Mechcalc.
+#
+# Mechcalc is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Mechcalc is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+##
+import os
+import sys
+from subprocess import Popen, PIPE
+
+class pyuic():
+    def __init__(self, path):
+        self._path = path;
+        self._file_types = ['.qrc', '.ui']
+        print self._path
+        self._search_path(self._path)
+
+    def _search_path(self, path):
+        if os.path.isdir(path):
+            for item in os.listdir(path):
+                item_path = os.path.join(path, item)
+                if os.path.isdir(item_path):
+                    self._search_path(item_path)
+                else:                   
+                    name, ext = os.path.splitext(item_path)
+                   
+                    if ext in self._file_types:
+                        self._compile_file(item_path)
+                    
+            return True
+        else:
+            return False
+
+
+    def _compile_file(self, path):
+        if path.endswith('.ui'):
+            cmd = 'pyuic4 -o %s.py %s' % (os.path.splitext(path)[0], path)
+        else:
+            cmd = 'pyrcc4 -o %s_rc.py %s' % (os.path.splitext(path)[0], path)
+
+        p = Popen(cmd, stdout=PIPE, stderr=PIPE, shell=True)
+        err = p.stderr.read()
+        if err:
+            print 'Failed: %s' % cmd
+        else:
+            print 'Compiled: %s' % os.path.basename(path)
+
+if __name__ == '__main__':
+    py = pyuic(os.path.abspath(os.getcwd()))
+    
